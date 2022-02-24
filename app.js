@@ -2,7 +2,6 @@ const ticTacToe = (() => {
 
     const gameBoard = {board: [["", "", ""], ["", "", ""], ["", "", ""]]};
     const {board} = gameBoard;
-    let turns = 0;
     let difficulty = "easy";
 
     const isMovesLeft = (board) => {
@@ -83,8 +82,6 @@ const ticTacToe = (() => {
                 board[row][col] = "";
             }
         }
-    
-        turns = 0;
     
         const buttons = document.querySelectorAll('.board button');
         buttons.forEach(button => {
@@ -223,12 +220,11 @@ const ticTacToe = (() => {
             const row = e.target.dataset.key.charAt(0);
             const col = e.target.dataset.key.charAt(1);
             board[row][col] = "O";
-            turns++;
 
             checkWinner(board);
         
             // Computer Move using minimax algorithm
-            if(turns !== 9 && e.target.disabled !== true) {
+            if(isMovesLeft(board) === true && e.target.disabled === false) {
 
                 if(difficulty === "easy") {
                     let randomRow = 0;
@@ -240,15 +236,13 @@ const ticTacToe = (() => {
         
                     document.querySelector(`button[data-key="${randomRow}${randomCol}"]`).textContent = "X";
                     board[randomRow][randomCol] = "X";            
-                    turns++;
         
                     checkWinner(board);             
                 }
                 else if(difficulty === "impossible") {
                     const bestMove = findBestMove(board);
                     document.querySelector(`button[data-key="${bestMove.row}${bestMove.col}"]`).textContent = "X";
-                    board[bestMove.row][bestMove.col] = "X";    
-                    turns++;        
+                    board[bestMove.row][bestMove.col] = "X";           
 
                     checkWinner(board);       
                 }
