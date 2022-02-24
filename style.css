@@ -1,8 +1,14 @@
+@font-face {
+    font-family: mainFont;
+    src: url('fonts/Cinzel-VariableFont_wght.ttf');
+}
+
 body {
     margin: 0;
     height: 100vh;
     display: grid;
     grid-template-rows: 10% 90%;
+    font-family: mainFont;
 }
 
 .header {
@@ -41,7 +47,7 @@ body {
     justify-content: center;
     align-items: center;
 
-    font-size: 60px;
+    font-size: 50px;
 }
 
 .board {
@@ -55,6 +61,7 @@ body {
 
 .board button {
     font-size: 80px;
+    font-family: mainFont;
 }
 
 .restart-btn {
@@ -62,6 +69,7 @@ body {
     color: white;
     font-size: 40px;
     font-weight: bold;
+    font-family: mainFont;
     height: 75px;
     width: 500px;
 

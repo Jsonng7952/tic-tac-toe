@@ -3,6 +3,7 @@ const ticTacToe = (() => {
     const gameBoard = {board: [["", "", ""], ["", "", ""], ["", "", ""]]};
     const {board} = gameBoard;
     let turns = 0;
+    let difficulty = "easy";
 
     const isMovesLeft = (board) => {
         for(let row = 0; row < 3; row++) {
@@ -114,13 +115,10 @@ const ticTacToe = (() => {
         // Create listener for restart button.
         const restartBtn = document.querySelector('.restart-btn');
         restartBtn.addEventListener('click', restartGame);
-    }
 
-    const disableButton = () => {
-        const buttons = document.querySelectorAll('.board button');
-        buttons.forEach(button => {
-            button.disabled = true;
-        });
+        // Create listener for changing difficulty of AI.
+        const aiDifficulty = document.querySelector('#ai-difficulty');
+        aiDifficulty.addEventListener('change', (e) => changeDifficulty(e));
     }
 
     const evaluateBoard = (board) => {
@@ -170,6 +168,13 @@ const ticTacToe = (() => {
         return 0;
     }
 
+    const disableButton = () => {
+        const buttons = document.querySelectorAll('.board button');
+        buttons.forEach(button => {
+            button.disabled = true;
+        });
+    }
+
     const checkWinner = (board) => {
 
         const winnerMessage = document.querySelector('.winner-msg');
@@ -206,6 +211,11 @@ const ticTacToe = (() => {
         }
     }
 
+    const changeDifficulty = (e) => {
+        restartGame();
+        difficulty = e.target.value;
+    }
+
     const playGame = (e) => {
         if(e.target.textContent === "") {
             // Player Move
@@ -219,33 +229,30 @@ const ticTacToe = (() => {
         
             // Computer Move using minimax algorithm
             if(turns !== 9 && e.target.disabled !== true) {
-                const bestMove = findBestMove(board);
-                document.querySelector(`button[data-key="${bestMove.row}${bestMove.col}"]`).textContent = "X";
-                board[bestMove.row][bestMove.col] = "X";    
-                turns++;        
 
-                checkWinner(board);
+                if(difficulty === "easy") {
+                    let randomRow = 0;
+                    let randomCol = 0;
+                    do {
+                        randomRow = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
+                        randomCol = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
+                    } while (board[randomRow][randomCol] !== "" && (board[randomRow][randomCol] === "X" || board[randomRow][randomCol] === "O"))
+        
+                    document.querySelector(`button[data-key="${randomRow}${randomCol}"]`).textContent = "X";
+                    board[randomRow][randomCol] = "X";            
+                    turns++;
+        
+                    checkWinner(board);             
+                }
+                else if(difficulty === "impossible") {
+                    const bestMove = findBestMove(board);
+                    document.querySelector(`button[data-key="${bestMove.row}${bestMove.col}"]`).textContent = "X";
+                    board[bestMove.row][bestMove.col] = "X";    
+                    turns++;        
+
+                    checkWinner(board);       
+                }
             }
-    
-            // Computer Move on any random open spot
-            /*
-            if(turns !== 9 && e.target.disabled !== true) { // Stops the computer from moving if there is a tie or winner.
-                
-                let randomRow = 0;
-                let randomCol = 0;
-                do {
-                    randomRow = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
-                    randomCol = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
-                } while (board[randomRow][randomCol] !== "" && (board[randomRow][randomCol] === "X" || board[randomRow][randomCol] === "O") )
-    
-                document.querySelector(`button[data-key="${randomRow}${randomCol}"]`).textContent = "O";
-                board[randomRow][randomCol] = "O";            
-                turns++;
-    
-                checkWinner();
-            }
-            */
-            
         }
     }
 
