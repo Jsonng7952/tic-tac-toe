@@ -4,6 +4,77 @@ const ticTacToe = (() => {
     const {board} = gameBoard;
     let turns = 0;
 
+    const isMovesLeft = (board) => {
+        for(let row = 0; row < 3; row++) {
+            for(let col = 0; col < 3; col++) {
+                if(board[row][col] === "") {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    const findBestMove = (board) => {
+        let bestScore = -Infinity;
+        let bestMove;
+        for(let row = 0; row < 3; row++) {
+            for(let col = 0; col < 3; col++) {
+                if(board[row][col] === ""){
+                    board[row][col] = "X";
+                    let score = minimax(board, 0, false);
+                    board[row][col] = "";
+
+                    // Update the best score.
+                    if(score > bestScore) {
+                        bestScore = score;
+                        bestMove = {row, col};
+                    }
+                }
+            }
+        }
+        return bestMove;
+    }
+
+    const minimax = (board, depth, isMaxPlayer) => {
+        let results = evaluateBoard(board);
+        if(results === 1 || results === -1) {
+            return results;
+        }
+        if(isMovesLeft(board) === false) {
+            return  0;
+        }
+
+        if(isMaxPlayer) {
+            let bestVal = -Infinity;
+
+            for(let row = 0; row < 3; row++) {
+                for(let col = 0; col < 3; col++) {
+                    if(board[row][col] === ""){
+                        board[row][col] = "X";
+                        bestVal = Math.max(bestVal, minimax(board, depth + 1, false));
+                        board[row][col] = "";
+                    }
+                }
+            }
+            return bestVal;
+        }
+        else {
+            let bestVal = Infinity;
+
+            for(let row = 0; row < 3; row++) {
+                for(let col = 0; col < 3; col++) {
+                    if(board[row][col] == ""){
+                        board[row][col] = "O";
+                        bestVal = Math.min (bestVal, minimax(board, depth + 1, true));
+                        board[row][col] = "";
+                    }
+                }
+            }
+            return bestVal;
+        }
+    }
+
     const restartGame = () => {
         // Reset array
         for(let row = 0; row < 3; row++) {
@@ -52,98 +123,114 @@ const ticTacToe = (() => {
         });
     }
 
+    const evaluateBoard = (board) => {
+
+        // Rows
+        for(let r = 0; r < 3; r++) {
+            if(board[r][0] === board[r][1] && board[r][1] === board[r][2] && board[r][0] !== "") {
+                if(board[r][0] === "X") {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            }
+        }     
+        
+        // Columns
+        for(let c = 0; c < 3; c++) {
+            if(board[0][c] === board[1][c] && board[1][c] === board[2][c] && board[0][c] !== "") {
+                if(board[0][c] === "X") {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            }
+        }       
+        
+        // Diagonals
+        if(board[0][0] === board[1][1] && board[1][1] === board[2][2] && board[0][0] !== "") {
+            if(board[0][0] === "X") {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        }
+        if(board[0][2] === board[1][1] && board[1][1] === board[2][0] && board[0][2] !== "") {
+            if(board[0][2] === "X") {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
     const checkWinner = (board) => {
 
         const winnerMessage = document.querySelector('.winner-msg');
-    
-        if(turns === 9) {
+
+        if(isMovesLeft(board) === false) {
             winnerMessage.textContent = "Draw!";
             disableButton();
         }
-        else {
-            // Rows
-            if(board[0][0] == "X" && board[0][1] == "X" && board[0][2] == "X"){
-                winnerMessage.textContent = "X is the Winner!";
+
+        // Rows
+        for(let r = 0; r < 3; r++) {
+            if(board[r][0] === board[r][1] && board[r][1] === board[r][2] && board[r][0] !== "") {
+                winnerMessage.textContent = `${board[r][0]} is the Winner!`;
                 disableButton();
             }
-            else if(board[1][0] == "X" && board[1][1] == "X" && board[1][2] == "X") {
-                winnerMessage.textContent = "X is the Winner!";
+        }     
+        
+        // Columns
+        for(let c = 0; c < 3; c++) {
+            if(board[0][c] === board[1][c] && board[1][c] === board[2][c] && board[0][c] !== "") {
+                winnerMessage.textContent = `${board[0][c]} is the Winner!`;
                 disableButton();
             }
-            else if(board[2][0] == "X" && board[2][1] == "X" && board[2][2] == "X") {
-                winnerMessage.textContent = "X is the Winner!";
-                disableButton();
-            }
-            else if(board[0][0] == "O" && board[0][1] == "O" && board[0][2] == "O"){
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }
-            else if(board[1][0] == "O" && board[1][1] == "O" && board[1][2] == "O") {
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }
-            else if(board[2][0] == "O" && board[2][1] == "O" && board[2][2] == "O") {
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }
-            // Columns
-            else if(board[0][0] == "X" && board[1][0] == "X" && board[2][0] == "X"){
-                winnerMessage.textContent = "X is the Winner!";
-                disableButton();
-            }
-            else if(board[0][1] == "X" && board[1][1] == "X" && board[2][1] == "X") {
-                winnerMessage.textContent = "X is the Winner!";
-                disableButton();
-            }
-            else if(board[0][2] == "X" && board[1][2] == "X" && board[2][2] == "X") {
-                winnerMessage.textContent = "X is the Winner!";
-                disableButton();
-            }
-            else if(board[0][0] == "O" && board[1][0] == "O" && board[2][0] == "O"){
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }
-            else if(board[0][1] == "O" && board[1][1] == "O" && board[2][1] == "O") {
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }
-            else if(board[0][2] == "O" && board[1][2] == "O" && board[2][2] == "O") {
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }    
-            // Diagonals
-            else if(board[0][0] == "X" && board[1][1] == "X" && board[2][2] == "X"){
-                winnerMessage.textContent = "X is the Winner!";
-                disableButton();
-            }
-            else if(board[0][2] == "X" && board[1][1] == "X" && board[2][0] == "X") {
-                winnerMessage.textContent = "X is the Winner!";
-                disableButton();
-            }
-            else if(board[0][0] == "O" && board[1][1] == "O" && board[2][2] == "O") {
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }
-            else if(board[0][2] == "O" && board[1][1] == "O" && board[2][0] == "O") {
-                winnerMessage.textContent = "O is the Winner!";
-                disableButton();
-            }        
+        }       
+        
+        // Diagonals
+        if(board[0][0] === board[1][1] && board[1][1] === board[2][2] && board[0][0] !== "") {
+            winnerMessage.textContent = `${board[0][0]} is the Winner!`;
+            disableButton();
+        }
+        if(board[0][2] === board[1][1] && board[1][1] === board[2][0] && board[0][2] !== "") {
+            winnerMessage.textContent = `${board[0][2]} is the Winner!`;
+            disableButton();
         }
     }
 
     const playGame = (e) => {
-        if(e.target.textContent === "" && (e.target.textContent !== "X" || e.target.textContent !== "O")) {
+        if(e.target.textContent === "") {
             // Player Move
-            e.target.textContent = "X";
+            e.target.textContent = "O";
             const row = e.target.dataset.key.charAt(0);
             const col = e.target.dataset.key.charAt(1);
-            board[row][col] = "X";
+            board[row][col] = "O";
             turns++;
-    
+
             checkWinner(board);
+        
+            // Computer Move using minimax algorithm
+            if(turns !== 9 && e.target.disabled !== true) {
+                const bestMove = findBestMove(board);
+                document.querySelector(`button[data-key="${bestMove.row}${bestMove.col}"]`).textContent = "X";
+                board[bestMove.row][bestMove.col] = "X";    
+                turns++;        
+
+                checkWinner(board);
+            }
     
-            // Computer Move
+            // Computer Move on any random open spot
+            /*
             if(turns !== 9 && e.target.disabled !== true) { // Stops the computer from moving if there is a tie or winner.
+                
                 let randomRow = 0;
                 let randomCol = 0;
                 do {
@@ -155,8 +242,10 @@ const ticTacToe = (() => {
                 board[randomRow][randomCol] = "O";            
                 turns++;
     
-                checkWinner(board);
+                checkWinner();
             }
+            */
+            
         }
     }
 
